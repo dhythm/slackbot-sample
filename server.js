@@ -10,10 +10,22 @@ const app = new App({
 });
 
 app.command("e2e", async ({ ack, logger, ...rest }) => {
+  console.log({ rest });
   await ack();
   try {
-    console.log(rest);
-    // logger.info(result);
+    const url = `https://circleci.com/api/v2/project/gh/${process.env.GITHUB_ACCOUNT_NAME}/${process.env.GITHUB_REPOSITORY_NAME}/pipeline`;
+    const data = {
+      branch: `${process.env.GITHUB_BRANCH_NAME}`,
+      parameters: { manual_execution: true },
+    };
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    logger.info(response);
   } catch (error) {
     logger.error(error);
   }
